@@ -1,4 +1,4 @@
-(defproject de.active-group/active-viz "0.1.0-SNAPSHOT"
+(defproject de.active-group/active-viz "0.1.1-SNAPSHOT"
   :description "Active Viz: ClojureScript SVG visualization tools"
   :url "https://github.com/active-group/active-viz"
   :license {:name "Eclipse Public License"
