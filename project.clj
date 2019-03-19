@@ -1,6 +1,6 @@
 (defproject de.active-group/active-viz "0.1.0-SNAPSHOT"
   :description "Active Viz: ClojureScript SVG visualization tools"
-  :url "http://example.com/FIXME"
+  :url "https://github.com/active-group/active-viz"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}
 
