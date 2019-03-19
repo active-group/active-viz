@@ -1,0 +1,2 @@
+^{:open-url "http://[[server-hostname]]:[[server-port]]/test.html"}
+{:main active-viz.test-runner}
