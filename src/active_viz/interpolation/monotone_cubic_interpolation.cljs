@@ -31,7 +31,7 @@
 (defn interpolate
   "Interpolates the given points using Fritsch-Carlson Monotone cubic Hermite interpolation. \n
 
-  Expects at least 3 points sorted monotonically by the x coordinate. \n
+  Expects at least 3 points sorted by the x coordinate. \n
 
   An optional parameter \"smoothness\" can be specified to adjust smoothing. A value between 2 and 10 is
   recommended, where 2 is very smooth and 10 less smooth. \n
