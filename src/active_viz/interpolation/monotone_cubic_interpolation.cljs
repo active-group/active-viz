@@ -48,7 +48,8 @@
 
         [p0 m0] (first p+fds)
         p+fds* (rest p+fds)]
-    (->> (reduce
+    (as-> p+fds* $
+      (reduce
        (fn [[acc prev-point] [point m]]
          (let [prev-m (first acc)
                acc*   (rest acc)
@@ -72,7 +73,7 @@
                  ;; (2)
                  [(cons m acc) point])))))
        [[m0] p0]
-       p+fds*)
-      (first)
-      (reverse)
-      ((fn [p] (normalize-tagents (vec points) p smoothness))))))
+       $)
+      (first $)
+      (reverse $)
+      (normalize-tagents (vec points) $ smoothness))))
