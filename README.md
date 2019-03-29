@@ -8,6 +8,8 @@ This library provides tooling for data visualizations. At this point it is restr
 
 * It provides Scales, an entity to map domains to ranges. This is useful to map data to viewports. Scales are composable.
 * It provides ticks calculation. This is useful for defining nice ticks on axis based on several demands.
+* It provides various interpolations for smooth curves. 
+* It provides path utilities to generate path strings for svg rendering.
 
 ## Development
 
