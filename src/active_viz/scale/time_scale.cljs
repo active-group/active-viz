@@ -5,7 +5,7 @@
             [active-viz.scale.linear-scale :as linear-scale]
             [active.clojure.record :as rec :refer-macros [define-record-type]]
             [active-viz.ticks :as ticks]
-            [active-viz.scale.util :as util])
+            [active-viz.scale :as scale])
   (:refer-clojure :exclude [second]))
 
 
@@ -41,14 +41,50 @@
 (def second-unit (make-unit time/second time/seconds second-ms second-nice))
 (def ms-unit (make-unit time/millis time/millis millisecond millisecond-nice))
 
-(defn time-scale [[domain-min domain-max] [range-min range-max]]
+
+(defn apply-linear-scale [domain-spread range-spread domain-min range-min value]
+  (let [normalized (/ (- value domain-min) domain-spread)]
+    (+ (* normalized range-spread) range-min)))
+
+
+
+(define-record-type TimeScaleParams
+  (make-time-scale-params domain-min-ms domain-spread-ms range-spread) time-scale-params?
+  [domain-min-ms time-scale-params-domain-min-ms
+   domain-spread-ms time-scale-params-domain-spread-ms
+   range-spread time-scale-params-range-spread-ms]
+
+  scale/ScaleFn
+
+  (call [this scale param]
+    (let [range-min  (scale/scale-range-min scale)
+          domain-min (time-scale-params-domain-min-ms this)
+          domain-spread (time-scale-params-domain-spread-ms this)
+          range-spread  (time-scale-params-range-spread-ms this)
+          param-ms (coerce/to-long param)]
+      (apply-linear-scale domain-spread range-spread domain-min range-min param-ms)))
+
+  (call-inverse [this scale param]
+    (let [domain-min (time-scale-params-domain-min-ms this)
+          range-min  (scale/scale-range-min scale)
+
+          domain-spread (time-scale-params-domain-spread-ms this)
+          range-spread  (time-scale-params-range-spread-ms this)]
+      (coerce/from-long
+       (apply-linear-scale range-spread domain-spread range-min domain-min param)))))
+
+
+
+
+(defn make-time-scale [[domain-min domain-max] [range-min range-max]]
   ;; we will use linear scale internally over the ms passed between the dates
   (let [start-date-ms (coerce/to-long domain-min)
         end-date-ms   (coerce/to-long domain-max)
-        scale         (util/scale-scale-fn (linear-scale/linear-scale [start-date-ms end-date-ms] [range-min range-max]))]
-    (util/make-scale domain-min domain-max range-min range-max
-      (fn [value]
-        (scale (coerce/to-long value))))))
+        domain-spread-ms (- end-date-ms start-date-ms)
+        range-spread (- range-max range-min)]
+    (scale/make-scale domain-min domain-max range-min range-max
+      (make-time-scale-params start-date-ms domain-spread-ms range-spread)
+      scale/nop)))
 
 
 (defn- indivisible-unit-constructor? [constr]
@@ -116,8 +152,8 @@
 
 (defn time-scale->ticks [scale type num-ticks]
   ;; Type can be: :year :month :week :day :hour :minute :second :millisecond
-  (let [start-date (util/scale-domain-min scale)
-        end-date   (util/scale-domain-max scale)
+  (let [start-date (scale/scale-domain-min scale)
+        end-date   (scale/scale-domain-max scale)
         start-date-ms (coerce/to-long start-date)
         end-date-ms (coerce/to-long end-date)
         unit (choose-unit type)]

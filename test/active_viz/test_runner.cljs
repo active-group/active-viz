@@ -2,7 +2,7 @@
 (ns active-viz.test-runner
   (:require
     ;; require all the namespaces that you want to test
-    [active-viz.scale.util-test]
+    [active-viz.scale-test]
     [active-viz.scale.linear-scale-test]
     [active-viz.scale.time-scale-test]
     [active-viz.ticks-test]
