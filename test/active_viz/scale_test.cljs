@@ -6,6 +6,13 @@
             [cljs.test :refer-macros [deftest is testing]]))
 
 
+(def eps 0.00001)
+
+(defn eq [a b]
+  (and
+    (> (+ b eps) a)
+    (< (- b eps) a)))
+
 (deftest scale
 
   (testing "combines two scales properly"
@@ -16,7 +23,7 @@
           combined-scale (scale/>> time-scale linear-scale)]
 
       (is (= (scale/scale combined-scale start-date) 0))
-      (is (= (scale/scale combined-scale end-date) 1000))))
+      (is (eq 1000 (scale/scale combined-scale end-date)))))
 
 
   (testing "inverts a scale range"

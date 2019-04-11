@@ -2,53 +2,32 @@
   (:require
    [active-viz.ticks :as ticks]
    [active.clojure.record :as rec :refer-macros [define-record-type]]
-   [active-viz.scale :as scale]))
-
-
-
-(defn apply-linear-scale [domain-spread range-spread domain-min range-min value]
-  (let [normalized (/ (- value domain-min) domain-spread)]
-    (+ (* normalized range-spread) range-min)))
+   [active-viz.scale.types :as types]))
 
 
 
 
 (define-record-type LinearScaleParams
-  (make-linear-scale-params domain-spread range-spread) linear-scale-params?
-  [domain-spread linear-scale-params-domain-spread
-   range-spread linear-scale-params-range-spread]
+  (make-linear-scale-params a b) linear-scale-params?
+  [a linear-scale-a
+   b linear-scale-b]
 
-  scale/ScaleFn
-
+  types/ScaleFn
   (call [this scale param]
-    (let [domain-min (scale/scale-domain-min scale)
-          range-min  (scale/scale-range-min scale)
-
-          domain-spread (linear-scale-params-domain-spread this)
-          range-spread  (linear-scale-params-range-spread this)]
-      (apply-linear-scale domain-spread range-spread domain-min range-min param)))
+    (+ (* param (linear-scale-a this)) (linear-scale-b this)))
 
   (call-inverse [this scale param]
-    (let [domain-min (scale/scale-domain-min scale)
-          range-min  (scale/scale-range-min scale)
-
-          domain-spread (linear-scale-params-domain-spread this)
-          range-spread  (linear-scale-params-range-spread this)]
-      (apply-linear-scale range-spread domain-spread range-min domain-min param))))
-
-
+    (/ (- param (linear-scale-b this))  (linear-scale-a this))))
 
 
 (defn make-linear-scale [[domain-min domain-max] [range-min range-max]]
   (let [domain-spread (- domain-max domain-min)
-        range-spread  (- range-max range-min)]
-    (scale/make-scale
-      domain-min
-      domain-max
-      range-min
-      range-max
-      (make-linear-scale-params domain-spread range-spread)
-      scale/nop)))
+        range-spread  (- range-max range-min)
+        a             (/ range-spread domain-spread)
+        b             (- range-min (* domain-min a))]
+    (types/make-scale domain-min domain-max range-min range-max
+      (make-linear-scale-params a b)
+      types/nop)))
 
 
 (defn- to-ticks [{:keys [lstep lmin lmax]}]
@@ -69,6 +48,6 @@
 
 (defn linear-scale->ticks [scale num-ticks]
   (ticks
-    (scale/scale-domain-min scale)
-    (scale/scale-domain-max scale)
+    (types/scale-domain-min scale)
+    (types/scale-domain-max scale)
     num-ticks))

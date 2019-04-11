@@ -11,6 +11,7 @@
           end-date   (time/date-time 2019 1 1 0 0 0 0)
           mid-date   (time/plus start-date (time/days 100))
           s          (time-scale/make-time-scale [start-date end-date] [100 246])]
+
       (is (= (scale/scale s start-date) 100))
       (is (= (scale/scale s end-date) 246))
       (is (= (scale/scale s mid-date) 140))
