@@ -50,14 +50,12 @@
 
   types/ScaleFn
 
-  (call [this scale param]
-    (let [param-ms (coerce/to-long param)
-          linear-scale (time-scale-params-linear-scale this)]
+  (call [_ _ param]
+    (let [param-ms (coerce/to-long param)]
       (types/call (types/scale-params linear-scale) linear-scale param-ms)))
 
-  (call-inverse [this scale param]
-    (let [linear-scale (time-scale-params-linear-scale this)]
-      (coerce/from-long (types/call-inverse (types/scale-params linear-scale) linear-scale param)))))
+  (call-inverse [_ _ param]
+    (coerce/from-long (types/call-inverse (types/scale-params linear-scale) linear-scale param))))
 
 
 (defn make-time-scale [[domain-min domain-max] [range-min range-max]]

@@ -8,16 +8,18 @@
 
 
 (define-record-type LinearScaleParams
+
   (make-linear-scale-params a b) linear-scale-params?
   [a linear-scale-a
    b linear-scale-b]
 
   types/ScaleFn
-  (call [this scale param]
-    (+ (* param (linear-scale-a this)) (linear-scale-b this)))
+  (call [_ _ param]
+    (+ (* param a) b))
 
-  (call-inverse [this scale param]
-    (/ (- param (linear-scale-b this))  (linear-scale-a this))))
+  (call-inverse [_ _ param]
+    (/ (- param b) a)))
+
 
 
 (defn make-linear-scale [[domain-min domain-max] [range-min range-max]]
