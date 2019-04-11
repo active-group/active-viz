@@ -2,6 +2,8 @@
 
 A ClojureScript library containing helpers for data visualization
 
+[![Clojars Project](https://img.shields.io/clojars/v/de.active-group/active-viz.svg)](https://clojars.org/de.active-group/active-viz)
+
 ## Overview
 
 This library provides tooling for data visualizations. At this point it is restricted to charts:
