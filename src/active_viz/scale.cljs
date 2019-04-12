@@ -94,7 +94,7 @@
   "Pads a scale to 0. That is, it subtracts or adds an offset to the smallest range boundary, setting it to 0"
   [scale]
   (letfn [(negate [v] (* -1 v))]
-    (->> (min (types/scale-range-min scale) (types/scale-range-max scale))
+    (->> (apply min (range scale))
       (negate)
       (pad scale))))
 
