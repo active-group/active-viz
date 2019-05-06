@@ -79,28 +79,33 @@
 
 (defn- round [a] (/ (Math/round (* 1000000 a)) 1000000))
 
-(defn- create-time-ticks [{:keys [lmin lmax lstep]} first-date last-date
-                         time-unit-constructor]
-
-  (let [fix-indivisible? (and (indivisible-unit-constructor? time-unit-constructor)
+(defn- create-time-ticks [{:keys [lmin lmax lstep]} first-date last-date time-unit-constructor]
+  (let [fix-indivisible? (and
+                           (indivisible-unit-constructor? time-unit-constructor)
                            (not (int? lstep)))
-        ticks-step   (if fix-indivisible?
-                       (round-indivisible lstep)
-                       (round lstep))
+
+        ticks-step   (if fix-indivisible? (round-indivisible lstep) (round lstep))
+
+        first-date-ms (coerce/to-long first-date)
+        last-date-ms (coerce/to-long last-date)
 
         inc-datetime #(time/plus % (time-unit-constructor ticks-step))]
 
     (-> (loop [current lmin
                acc     []]
-          (if (<= current lmax)
+          (cond
+            (< current first-date-ms)
             (recur
               (round (+ current ticks-step))
-              (if (empty? acc)
-                [first-date]
-                (cons (inc-datetime (first acc))  acc)))
-            (if (< (coerce/to-long (first acc)) (coerce/to-long last-date))
-              (cons (inc-datetime (first acc))  acc)
-              acc)))
+              [first-date])
+
+            (> current last-date)
+            (cons (inc-datetime (first acc)))
+
+            :default
+            (recur
+              (round (+ current ticks-step))
+              (cons (inc-datetime (first acc))))))
       reverse)))
 
 
