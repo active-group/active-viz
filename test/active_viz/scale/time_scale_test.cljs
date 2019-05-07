@@ -24,4 +24,25 @@
         (is (not (or (time/after? inverted-end  end-date)
                    (time/before? inverted-end  end-date))))
         (is (not (or (time/after? inverted-mid  mid-date)
-                   (time/before? inverted-mid  mid-date))))))))
+                   (time/before? inverted-mid  mid-date)))))))
+
+
+  (testing "time scale are comparable"
+    (let [start-date (time/date-time 2018 1 1 0 0 0 0)
+          end-date   (time/date-time 2019 1 1 0 0 0 0)
+          mid-date   (time/plus start-date (time/days 100))
+          s          (time-scale/make-time-scale [start-date end-date] [100 246])
+          s2         (time-scale/make-time-scale [start-date end-date] [100 246])]
+
+      (is (= s s2))))
+
+
+  (testing "ticks are generated without crashing"
+    (let [start-date (time/date-time 2018 1 1 0 0 0 0)
+          end-date   (time/date-time 2019 1 1 0 0 0 0)
+          s          (time-scale/make-time-scale [start-date end-date] [100 246])]
+      (is (= (count (time-scale/time-scale->ticks s :month 13)) 13))
+      (is (= (count (time-scale/time-scale->ticks s :month  4)) 5))
+      )
+    )
+  )

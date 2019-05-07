@@ -42,6 +42,15 @@
 (def ms-unit (make-unit time/millis time/millis millisecond millisecond-nice))
 
 
+(def units
+  {:year        year-unit
+   :month       month-unit
+   :day         day-unit
+   :hour        hour-unit
+   :minute      minute-unit
+   :second      second-unit
+   :millisecond ms-unit})
+
 
 
 (define-record-type TimeScaleParams
@@ -68,72 +77,55 @@
       types/nop)))
 
 
-(defn- indivisible-unit-constructor? [constr]
-  (or
-    (= constr time/months)
-    (= constr time/years)))
+(defn find-nice-value [start-date end-date num-ticks unit]
+  (->
+   (let [unit-ms     (unit-approx-ms unit)
+         nice-values (unit-nice-values unit)
+         interval    (- (coerce/to-long end-date) (coerce/to-long start-date))
+         score-fn    (fn [nice-val] (Math/abs (- num-ticks (/ interval (* nice-val unit-ms)))))]
+     (reduce
+       (fn [[best-score best-nice-value] nice-value]
+         (let [score (score-fn nice-value)]
+           (cond
+             (and best-score (> best-score score))
+             [score nice-value]
 
-(defn- round-indivisible [v]
-  (max 1 (Math/floor v)))
+             best-score
+             [best-score best-nice-value]
+
+             :default
+             [score nice-value])))
+       [nil nil]
+       nice-values))
+   clojure.core/second))
 
 
-(defn- round [a] (/ (Math/round (* 1000000 a)) 1000000))
+(defn t>= [a b]
+  (let [a-ms (coerce/to-long a)
+        b-ms (coerce/to-long b)]
+    (>= a-ms b-ms)))
 
-(defn- create-time-ticks [{:keys [lmin lmax lstep]} first-date last-date time-unit-constructor]
-  (let [fix-indivisible? (and
-                           (indivisible-unit-constructor? time-unit-constructor)
-                           (not (int? lstep)))
 
-        ticks-step   (if fix-indivisible? (round-indivisible lstep) (round lstep))
-
-        first-date-ms (coerce/to-long first-date)
-        last-date-ms (coerce/to-long last-date)
-
-        inc-datetime #(time/plus % (time-unit-constructor ticks-step))]
-
-    (-> (loop [current lmin
-               acc     []]
-          (cond
-            (< current first-date-ms)
-            (recur
-              (round (+ current ticks-step))
-              [first-date])
-
-            (> current last-date)
-            (cons (inc-datetime (first acc)))
-
-            :default
-            (recur
-              (round (+ current ticks-step))
-              (cons (inc-datetime (first acc))))))
-      reverse)))
+(defn- time-ceiling [t unit constructor]
+  (if (= (coerce/to-long (time/floor t unit)) (coerce/to-long t))
+    t
+    (time/floor (time/plus t (constructor 1)) unit)))
 
 
 (defn- create-ticks [start-date end-date num-ticks unit]
   (let [constructor (unit-time-constructor unit)
         nice-values (unit-nice-values unit)
-        unit-ms (unit-approx-ms unit)
-        time-unit (unit-time-unit unit)
+        time-unit   (unit-time-unit unit)
+        floor (time/floor start-date time-unit)
+        ceiling (time-ceiling end-date time-unit constructor)
+        nice-value (find-nice-value floor ceiling num-ticks unit)]
+    (loop [acc (list floor)]
+      (let [next-date  (time/plus (first acc) (constructor nice-value))
+            next-dates (cons next-date acc)]
+        (if (t>= next-date end-date)
+          next-dates
+          (recur next-dates))))))
 
-        first-ticks-date (time/floor start-date time-unit)
-        first-ticks-date-ms (coerce/to-long first-ticks-date)
-        relative-start-date-ms (- (coerce/to-long start-date) first-ticks-date-ms)
-        relative-end-date-ms (- (coerce/to-long end-date) first-ticks-date-ms)]
-    (some->
-      (ticks/nice-ticks (/ relative-start-date-ms unit-ms) (/ relative-end-date-ms unit-ms)
-        num-ticks nice-values)
-      (create-time-ticks first-ticks-date end-date constructor))))
-
-
-(defn- choose-unit [kw]
-  (case kw
-    :year        year-unit
-    :month       month-unit
-    :day         day-unit
-    :hour        hour-unit
-    :minute      minute-unit
-    :second      second-unit
-    :millisecond ms-unit))
 
 
 (defn time-scale->ticks [scale type num-ticks]
@@ -142,7 +134,7 @@
         end-date   (types/scale-domain-max scale)
         start-date-ms (coerce/to-long start-date)
         end-date-ms (coerce/to-long end-date)
-        unit (choose-unit type)]
+        unit (type units)]
     (create-ticks start-date end-date num-ticks unit)))
 
 
