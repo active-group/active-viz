@@ -42,15 +42,6 @@
 (def ms-unit (make-unit time/millis time/millis millisecond millisecond-nice))
 
 
-(def units
-  {:year        year-unit
-   :month       month-unit
-   :day         day-unit
-   :hour        hour-unit
-   :minute      minute-unit
-   :second      second-unit
-   :millisecond ms-unit})
-
 
 
 (define-record-type TimeScaleParams
@@ -77,7 +68,7 @@
       types/nop)))
 
 
-(defn find-nice-value [start-date end-date num-ticks unit]
+(defn- find-nice-value [start-date end-date num-ticks unit]
   (->
    (let [unit-ms     (unit-approx-ms unit)
          nice-values (unit-nice-values unit)
@@ -128,13 +119,9 @@
 
 
 
-(defn time-scale->ticks [scale type num-ticks]
-  ;; Type can be: :year :month :week :day :hour :minute :second :millisecond
+(defn time-scale->ticks [scale unit num-ticks]
   (let [start-date (types/scale-domain-min scale)
-        end-date   (types/scale-domain-max scale)
-        start-date-ms (coerce/to-long start-date)
-        end-date-ms (coerce/to-long end-date)
-        unit (type units)]
+        end-date   (types/scale-domain-max scale)]
     (create-ticks start-date end-date num-ticks unit)))
 
 
@@ -149,3 +136,29 @@
   (format/unparse month-formatter dt)
   #_(if (= 1 (time/day dt))
                           ""))
+
+
+(defn recommend-unit [start-date end-date]
+  (let [interval (- (coerce/to-long end-date) (coerce/to-long start-date))
+        gt       (fn [v] (> interval v))]
+    (cond
+      (gt (* month-ms 36))
+      year-unit
+
+      (gt (* day-ms 90))
+      month-unit
+
+      (gt (* hour-ms 72))
+      day-unit
+
+      (gt (* minute-ms 180))
+      hour-unit
+
+      (gt (* second-ms 180))
+      minute-unit
+
+      (gt 3000)
+      second-unit
+
+      :default
+      ms-unit)))

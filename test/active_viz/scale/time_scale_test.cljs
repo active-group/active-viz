@@ -41,8 +41,38 @@
     (let [start-date (time/date-time 2018 1 1 0 0 0 0)
           end-date   (time/date-time 2019 1 1 0 0 0 0)
           s          (time-scale/make-time-scale [start-date end-date] [100 246])]
-      (is (= (count (time-scale/time-scale->ticks s :month 13)) 13))
-      (is (= (count (time-scale/time-scale->ticks s :month  4)) 5))
-      )
+      (is (= (count (time-scale/time-scale->ticks s time-scale/month-unit 13)) 13))
+      (is (= (count (time-scale/time-scale->ticks s time-scale/month-unit  4)) 5))))
+
+
+  (testing "units are proposed depending on interval"
+    (is (= time-scale/year-unit (time-scale/recommend-unit
+                                  (time/date-time 2018 1 1 0 0 0 0)
+                                  (time/date-time 2021 1 1 0 0 0 0))))
+
+    (is (= time-scale/month-unit (time-scale/recommend-unit
+                                  (time/date-time 2018 1 1 0 0 0 0)
+                                  (time/date-time 2018 5 1 0 0 0 0))))
+
+    (is (= time-scale/day-unit   (time-scale/recommend-unit
+                                  (time/date-time 2018 1 1 0 0 0 0)
+                                  (time/date-time 2018 1 5 0 0 0 0))))
+
+    (is (= time-scale/hour-unit   (time-scale/recommend-unit
+                                   (time/date-time 2018 1 1 0 0 0 0)
+                                   (time/date-time 2018 1 1 5 0 0 0))))
+
+    (is (= time-scale/minute-unit (time-scale/recommend-unit
+                                    (time/date-time 2018 1 1 0 0 0 0)
+                                    (time/date-time 2018 1 1 0 5 0 0))))
+
+    (is (= time-scale/second-unit (time-scale/recommend-unit
+                                    (time/date-time 2018 1 1 0 0 0 0)
+                                    (time/date-time 2018 1 1 0 0 5 0))))
+
+    (is (= time-scale/ms-unit     (time-scale/recommend-unit
+                                    (time/date-time 2018 1 1 0 0 0 0)
+                                    (time/date-time 2018 1 1 0 0 0 5))))
+
     )
   )
