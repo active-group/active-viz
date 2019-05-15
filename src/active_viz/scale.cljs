@@ -1,6 +1,6 @@
 (ns active-viz.scale
   (:refer-clojure :exclude [range])
-  (:require [active.clojure.record :as rec :refer-macros [define-record-type]]
+  (:require [active.clojure.cljs.record :as rec :refer-macros [define-record-type]]
             [active-viz.scale.types :as types]
             [active-viz.scale.linear-scale :as linear-scale]
             [active-viz.scale.time-scale :as time-scale]

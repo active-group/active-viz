@@ -1,7 +1,7 @@
 (ns active-viz.scale.linear-scale
   (:require
    [active-viz.ticks :as ticks]
-   [active.clojure.record :as rec :refer-macros [define-record-type]]
+   [active.clojure.cljs.record :as rec :refer-macros [define-record-type]]
    [active-viz.scale.types :as types]))
 
 

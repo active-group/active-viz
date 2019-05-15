@@ -1,5 +1,5 @@
 (ns active-viz.scale.types
-  (:require [active.clojure.record :as rec :refer-macros [define-record-type]]))
+  (:require [active.clojure.cljs.record :as rec :refer-macros [define-record-type]]))
 
 (define-record-type
   ^{:doc "A scale represents a function from a domain described by `domain-min` and `domain-max` into a

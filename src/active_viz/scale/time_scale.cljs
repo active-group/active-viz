@@ -3,7 +3,7 @@
             [cljs-time.core :as time]
             [cljs-time.format :as format]
             [active-viz.scale.linear-scale :as linear-scale]
-            [active.clojure.record :as rec :refer-macros [define-record-type]]
+            [active.clojure.cljs.record :as rec :refer-macros [define-record-type]]
             [active-viz.ticks :as ticks]
             [active-viz.scale.types :as types])
   (:refer-clojure :exclude [second]))
