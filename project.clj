@@ -10,5 +10,7 @@
                  [de.active-group/active-clojure "0.30.0"]]
 
   :source-paths ["src"]
-  :aliases {"fig:test"  ["run" "-m" "figwheel.main" "-co" "test.cljs.edn" "-m" active-viz.test-runner]}
+  :aliases {"fig:test"  ["run" "-m" "figwheel.main" "-co" "test.cljs.edn" "-m" active-viz.test-runner]
+            "figtest-travis" ["run" "-m" "figwheel.main" "-fwo" "{:launch-js [\"google-chrome-stable\" \"--no-sandbox\" \"--headless\" \"--disable-gpu\" \"--repl\" :open-url] :repl-eval-timeout 30000}" "-co" "test.cljs.edn" "-m" active-viz.test-runner]
+            }
   :profiles {:dev {:dependencies [[com.bhauman/figwheel-main "0.1.9"]]}})
