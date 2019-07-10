@@ -7,7 +7,7 @@
   :dependencies [[org.clojure/clojure "1.10.0"]
                  [org.clojure/clojurescript "1.10.339"]
                  [com.andrewmcveigh/cljs-time "0.5.2"]
-                 [de.active-group/active-clojure "0.28.0"]]
+                 [de.active-group/active-clojure "0.30.0"]]
 
   :source-paths ["src"]
   :aliases {"fig:test"  ["run" "-m" "figwheel.main" "-co" "test.cljs.edn" "-m" active-viz.test-runner]}
