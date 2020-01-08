@@ -10,7 +10,22 @@
                  [de.active-group/active-clojure "0.31.0"]]
 
   :source-paths ["src"]
-  :aliases {"fig:test"        ["run" "-m" "figwheel.main" "-co" "test.cljs.edn" "-m" active-viz.test-runner]
-            "fig:test-travis" ["trampoline" "run" "-m" "figwheel.main" "-co" "test.cljs.edn" "-fwo" "{:launch-js [\"google-chrome-stable\" \"--no-sandbox\" \"--headless\" \"--disable-gpu\" \"--repl\" :open-url] :repl-eval-timeout 30000}"  "-m" active-viz.test-runner]
-            }
-  :profiles {:dev {:dependencies [[com.bhauman/figwheel-main "0.1.9"]]}})
+
+  :cljsbuild {:builds
+              {:test {:source-paths ["src" "test"]
+                      :compiler     {:output-to     "target/test.js"
+                                     ;; this fixes an error from doo
+                                     :output-dir    "target"
+                                     :main          active-viz.doo-test-runner
+                                     :optimizations :whitespace ;; This is required for testing with nashorn.
+                                     :pretty-print  true}}}}
+
+  :aliases      {"fig:test"        ["run" "-m" "figwheel.main" "-co" "test.cljs.edn" "-m" active-viz.test-runner]
+                 "fig:test-travis" ["trampoline" "run" "-m" "figwheel.main" "-co" "test.cljs.edn" "-fwo" "{:launch-js [\"google-chrome-stable\" \"--no-sandbox\" \"--headless\" \"--disable-gpu\" \"--repl\" :open-url] :repl-eval-timeout 30000}"  "-m" active-viz.test-runner]
+                 }
+  :profiles     {:dev {:dependencies [[com.bhauman/figwheel-main "0.1.9"]
+                                      [lein-doo "0.1.10"]]}}
+
+  :plugins [[lein-doo "0.1.10"]
+            [lein-cljsbuild "1.1.7"]]
+  )
