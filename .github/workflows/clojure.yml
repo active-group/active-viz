@@ -22,6 +22,7 @@ jobs:
         lein doo firefox-headless test once
         lein doo chrome-headless test once
     - name: notify with mattermost upon failure
+      if: failure()
       env:
         SECRET: ${{ secrets.MATTERMOST_WEBHOOK_URL }}
         CHANNEL: "@simon"
