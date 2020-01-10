@@ -22,8 +22,10 @@ jobs:
         lein doo firefox-headless test once
         lein doo chrome-headless test once
     - name: notify with mattermost upon failure
+      env:
+        SECRET: ${{ secrets.MATTERMOST_WEBHOOK_URL }}
+        CHANNEL: "@simon"
+        USERNAME: "GitHub"
       run: |
-        CHANNEL=@simon
-        USERNAME=GitHub
         URL=https://github.com/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}
-        'curl -i --data-urlencode "payload={\"channel\":\"${CHANNEL}\", \"username\":\"${USERNAME}\",\"text\":\"Failure in tests: ${URL}\"}" ${secrets.MATTERMOST_WEBHOOK_URL}'
+        'curl -i --data-urlencode "payload={\"channel\":\"${CHANNEL}\", \"username\":\"${USERNAME}\",\"text\":\"Failure in tests: ${URL}\"}" ${SECRET}'
