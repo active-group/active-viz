@@ -28,4 +28,4 @@ jobs:
         USERNAME: "GitHub"
       run: |
         URL=https://github.com/${GITHUB_REPOSITORY}/commit/${GITHUB_SHA}
-        'curl -i --data-urlencode "payload={\"channel\":\"${CHANNEL}\", \"username\":\"${USERNAME}\",\"text\":\"Failure in tests: ${URL}\"}" ${SECRET}'
+        curl -i --data-urlencode "payload={\"channel\":\"${CHANNEL}\", \"username\":\"${USERNAME}\",\"text\":\"Failure in tests: ${URL}\"}" ${SECRET}
