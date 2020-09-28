@@ -24,13 +24,13 @@
 (def month-ms (* 30 day-ms))
 (def year-ms (* 365 day-ms))
 
-(def millisecond-nice [1,5,2,2.5,3,4,1.5,7,6,8,9])
+(def millisecond-nice [1, 5, 10, 100, 250, 500, 1000])
 (def second-nice [1 2 3 4 5 10 20 30 60])
 (def minute-nice [1 2 5 10 15 30 60])
 (def hour-nice [1 2 4 6 8 24])
 (def day-nice [1 2 4 6 8 10 15 30 182.5 365])
 (def month-nice [1 3])
-(def year-nice [1,2,3,4,5,6,7,8,9])
+(def year-nice [1, 2, 3, 4, 5, 6, 7, 8, 9])
 
 
 (def year-unit (make-unit time/year time/years year-ms year-nice))
@@ -68,12 +68,11 @@
       types/nop)))
 
 
-(defn- find-nice-value [start-date end-date num-ticks unit]
+(defn- find-nice-value [interval-ms num-ticks unit]
   (->
    (let [unit-ms     (unit-approx-ms unit)
          nice-values (unit-nice-values unit)
-         interval    (- (coerce/to-long end-date) (coerce/to-long start-date))
-         score-fn    (fn [nice-val] (Math/abs (- num-ticks (/ interval (* nice-val unit-ms)))))]
+         score-fn    (fn [nice-val] (Math/abs (- num-ticks (/ interval-ms (* nice-val unit-ms)))))]
      (reduce
        (fn [[best-score best-nice-value] nice-value]
          (let [score (score-fn nice-value)]
@@ -109,7 +108,7 @@
         time-unit   (unit-time-unit unit)
         floor (time/floor start-date time-unit)
         ceiling (time-ceiling end-date time-unit constructor)
-        nice-value (find-nice-value floor ceiling num-ticks unit)]
+        nice-value (find-nice-value (- (coerce/to-long ceiling) (coerce/to-long floor)) num-ticks unit)]
     (loop [acc (list floor)]
       (let [next-date  (time/plus (first acc) (constructor nice-value))
             next-dates (cons next-date acc)]
