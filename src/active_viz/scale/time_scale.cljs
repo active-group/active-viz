@@ -39,7 +39,7 @@
 (def hour-unit (make-unit time/hour time/hours hour-ms hour-nice))
 (def minute-unit (make-unit time/minute time/minutes minute-ms minute-nice))
 (def second-unit (make-unit time/second time/seconds second-ms second-nice))
-(def ms-unit (make-unit time/millis time/millis millisecond millisecond-nice))
+(def ms-unit (make-unit time/milli time/millis millisecond millisecond-nice))
 
 
 
